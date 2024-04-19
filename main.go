@@ -25,28 +25,21 @@ func (maze Maze) PrintMaze() {
 	}
 }
 
-func isValidPoint(p Point, maze Maze) bool {
-	// Check if the point is within the maze
-	if p.x < 0 || p.x >= len(maze[0]) ||
-		p.y < 0 || p.y >= len(maze) {
-		return false
-	}
-	// Check if the current point is not a wall
-	if maze[p.y][p.x] == 1 {
-		return false
-	}
-	// Otherwise, point is valid
-	return true
+func isValidPt(p Point, maze Maze) bool {
+	// Check if the point is within the bounds of the maze
+	return p.x >= 0 && p.x < len(maze) && p.y >= 0 && p.y < len(maze[0]) &&
+		// Check if the cell at the point's coordinates is not a wall
+		maze[p.x][p.y] != 1
 }
 
-// solveMaze solves the maze using depth-first search (DFS) with an explicit stack
 func solveMaze(maze Maze, start, end Point) []Point {
 	// Initialize an empty stack and a map to keep track of visited points
 	stack := make([]Point, 0)
 	visited := make(map[Point]bool)
 
-	// Push the start point onto the stack
+	// Push the start point onto the stack and mark it as visited
 	stack = append(stack, start)
+	visited[start] = true
 
 	// Iterate until the stack is empty
 	for len(stack) > 0 {
@@ -60,16 +53,18 @@ func solveMaze(maze Maze, start, end Point) []Point {
 			return reconstructPath(start, current, visited, maze)
 		}
 
-		// Mark the current point as visited
-		visited[current] = true
-
-		// Push valid neighbors onto the stack
+		// Explore valid neighbors
 		for _, dir := range directions {
 			next := Point{current.x + dir.x, current.y + dir.y}
-			if isValidPoint(next, maze) && !visited[next] {
+			// Check if the next point is within bounds and not a wall
+			if isValidPt(next, maze) && !visited[next] {
 				stack = append(stack, next)
+				visited[next] = true // Mark the next point as visited
 			}
 		}
+
+		// Mark the current point as unvisited when backtracking
+		visited[current] = false
 	}
 
 	// If the end point is not reached, return an empty path
@@ -84,7 +79,7 @@ func reconstructPath(start, end Point, visited map[Point]bool, maze Maze) []Poin
 		path = append([]Point{current}, path...)
 		for _, dir := range directions {
 			previous := Point{current.x - dir.x, current.y - dir.y}
-			if isValidPoint(previous, maze) && visited[previous] {
+			if isValidPt(previous, maze) && visited[previous] {
 				current = previous
 				break
 			}
