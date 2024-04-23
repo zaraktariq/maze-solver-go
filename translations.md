@@ -15,6 +15,9 @@ def __init__(self, x, y):
 ------
 - := is used for short variable declaration and initialization.
 - = is used for variable assignment.
+
+- `nil` is used in Go to represent the absence of a value for certain types.
+- `null` is not used in Go, more common in the other languages we are familiar with
 ------
 #### This is how one prints in Go
 ```go
