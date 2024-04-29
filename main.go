@@ -8,22 +8,12 @@ type Point struct {
 	x, y int
 }
 
-type Maze [][]int
+var directions = []Point{{-1, 0}, {0, -1}, {1, 0}, {0, 1}} // Up, Left, Down, Right
 
-// Directions representing the four cardinal directions
-var directions = []Point{{-1, 0}, {0, -1}, {1, 0}, {0, 1}}
-
-func isValidPt(p Point, maze Maze) bool {
-	// Check if the point is within the bounds of the maze
-	return p.x >= 0 && p.x < len(maze) && p.y >= 0 && p.y < len(maze[0]) &&
-		// Check if the cell at the point's coordinates is not a wall
-		maze[p.x][p.y] != 1
-}
-
-func solveMaze(maze Maze, start, end Point) []Point {
-	// Initialize an empty stack and a map to keep track of visited points
-	stack := []Point{start}
+func solveMaze(maze [][]int, start, end Point) []Point {
+	var path []Point
 	visited := make(map[Point]bool)
+	stack := []Point{start}
 
 	// Iterate until the stack is empty
 	for len(stack) > 0 {
@@ -33,19 +23,25 @@ func solveMaze(maze Maze, start, end Point) []Point {
 
 		// If the current point is the end point, return the path
 		if current == end {
-			return []Point{start, end}
+			path = append(path, current)
+			return path
 		}
 
-		// Mark the current point as visited
-		visited[current] = true
+		if isValidPoint(current, maze) && !visited[current] {
+			path = append(path, current)
+			visited[current] = true
 
-		// Explore valid neighbors
-		for _, dir := range directions {
-			next := Point{current.x + dir.x, current.y + dir.y}
-			// Check if the next point is within bounds, not a wall, and not visited
-			if isValidPt(next, maze) && !visited[next] {
-				stack = append(stack, next)
+			// Explore valid neighbors
+			for _, dir := range directions {
+				next := Point{current.x + dir.x, current.y + dir.y}
+				// Check if the next point is within bounds, not a wall, and not visited
+				if isValidPoint(next, maze) && !visited[next] {
+					stack = append(stack, next)
+				}
 			}
+		} else {
+			// If the current point is invalid or visited, skip it
+			continue
 		}
 	}
 
@@ -53,19 +49,22 @@ func solveMaze(maze Maze, start, end Point) []Point {
 	return nil
 }
 
+func isValidPoint(p Point, maze [][]int) bool {
+	return p.x >= 0 && p.x < len(maze) && p.y >= 0 && p.y < len(maze[0]) && maze[p.x][p.y] != 1
+}
+
 func main() {
-	// Initialize a sample maze
-	maze := Maze{
+	maze := [][]int{
 		{0, 1, 0, 0, 0},
-		{0, 1, 0, 0, 0},
+		{0, 1, 0, 1, 0},
 		{0, 0, 0, 1, 0},
-		{1, 1, 0, 1, 1},
+		{1, 1, 1, 1, 0},
 		{0, 0, 0, 0, 0},
 	}
 
 	// Define start and end points
 	start := Point{0, 0}
-	end := Point{4, 4}
+	end := Point{4, 3}
 
 	// Solve the maze
 	path := solveMaze(maze, start, end)
