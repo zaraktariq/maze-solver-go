@@ -2,14 +2,10 @@ package main
 
 import (
 	"bufio"
-	_ "bufio"
 	"fmt"
 	"os"
-	_ "os"
 	"strconv"
-	_ "strconv"
 	"strings"
-	_ "strings"
 )
 
 type Point struct {
@@ -66,13 +62,7 @@ func loadMazeFromFile(filename string) ([][][]int, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer func(file *os.File) {
-		// similar to java's scanner.close
-		err := file.Close()
-		if err != nil {
-
-		}
-	}(file)
+	defer file.Close()
 
 	var mazes [][][]int
 	var maze [][]int
@@ -110,7 +100,7 @@ func loadMazeFromFile(filename string) ([][][]int, error) {
 			maze = append(maze, row)
 		}
 	}
-	return mazes, err
+	return mazes, nil
 }
 
 func main() {
@@ -120,26 +110,40 @@ func main() {
 		return
 	}
 
-	for i, maze := range mazes {
-		fmt.Printf("Maze %d:\n", i+1)
+	fmt.Println("Available Mazes:")
+	for i, _ := range mazes {
+		fmt.Printf("Maze %d\n", i+1)
+	}
 
-		// Define start and end points
-		start := Point{0, 0}
-		end := Point{len(maze) - 1, len(maze[0]) - 1}
+	var mazeChoice int
+	fmt.Println("Enter the maze number you want to solve:")
+	fmt.Scanf("%d", &mazeChoice)
 
-		// Solve the maze
-		path := solveMaze(maze, start, end)
+	// Validate user input
+	if mazeChoice < 1 || mazeChoice > len(mazes) {
+		fmt.Println("Invalid maze number. Please choose a number between 1 and", len(mazes))
+		return
+	}
 
-		// Print the path
-		if path != nil {
-			fmt.Println("Path found:")
-			for _, p := range path {
-				fmt.Printf("(%d, %d) -> ", p.x, p.y)
-			}
-			fmt.Println("End")
-		} else {
-			fmt.Println("No path found")
+	mazeIndex := mazeChoice - 1
+	maze := mazes[mazeIndex]
+
+	// Define start and end points (assuming they are same for all mazes)
+	start := Point{0, 0}
+	end := Point{len(maze) - 1, len(maze[0]) - 1}
+
+	// Solve the maze
+	path := solveMaze(maze, start, end)
+
+	// Print the path
+	fmt.Printf("Maze %d:\n", mazeChoice)
+	if path != nil {
+		fmt.Println("Path found:")
+		for _, p := range path {
+			fmt.Printf("(%d, %d) -> ", p.x, p.y)
 		}
-		fmt.Println()
+		fmt.Println("End")
+	} else {
+		fmt.Println("No path found")
 	}
 }
