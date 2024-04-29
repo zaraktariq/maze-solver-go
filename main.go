@@ -66,8 +66,13 @@ func loadMazeFromFile(filename string) ([][][]int, error) {
 	if err != nil {
 		return nil, err
 	}
-	// similar to java's scanner.close
-	defer file.Close()
+	defer func(file *os.File) {
+		// similar to java's scanner.close
+		err := file.Close()
+		if err != nil {
+
+		}
+	}(file)
 
 	var mazes [][][]int
 	var maze [][]int
@@ -109,29 +114,32 @@ func loadMazeFromFile(filename string) ([][][]int, error) {
 }
 
 func main() {
-	maze := [][]int{
-		{0, 1, 0, 0, 0},
-		{0, 1, 0, 1, 0},
-		{0, 0, 0, 1, 0},
-		{1, 1, 1, 1, 0},
-		{0, 0, 0, 0, 0},
+	mazes, err := loadMazeFromFile("maze.txt")
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
 	}
 
-	// Define start and end points
-	start := Point{0, 0}
-	end := Point{4, 3}
+	for i, maze := range mazes {
+		fmt.Printf("Maze %d:\n", i+1)
 
-	// Solve the maze
-	path := solveMaze(maze, start, end)
+		// Define start and end points
+		start := Point{0, 0}
+		end := Point{len(maze) - 1, len(maze[0]) - 1}
 
-	// Print the path
-	if path != nil {
-		fmt.Println("Path found:")
-		for _, p := range path {
-			fmt.Printf("(%d, %d) -> ", p.x, p.y)
+		// Solve the maze
+		path := solveMaze(maze, start, end)
+
+		// Print the path
+		if path != nil {
+			fmt.Println("Path found:")
+			for _, p := range path {
+				fmt.Printf("(%d, %d) -> ", p.x, p.y)
+			}
+			fmt.Println("End")
+		} else {
+			fmt.Println("No path found")
 		}
-		fmt.Println("End")
-	} else {
-		fmt.Println("No path found")
+		fmt.Println()
 	}
 }
