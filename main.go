@@ -1,7 +1,15 @@
 package main
 
 import (
+	"bufio"
+	_ "bufio"
 	"fmt"
+	"os"
+	_ "os"
+	"strconv"
+	_ "strconv"
+	"strings"
+	_ "strings"
 )
 
 type Point struct {
@@ -51,6 +59,42 @@ func solveMaze(maze [][]int, start, end Point) []Point {
 
 func isValidPoint(p Point, maze [][]int) bool {
 	return p.x >= 0 && p.x < len(maze) && p.y >= 0 && p.y < len(maze[0]) && maze[p.x][p.y] != 1
+}
+
+func loadMazeFromFile(filename string) ([][][]int, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	// similar to java's scanner.close
+	defer file.Close()
+
+	var mazes [][][]int
+	var maze [][]int
+	scanner := bufio.NewScanner(file)
+
+	// Check if the line is a delimiter
+	for scanner.Scan() {
+		line := scanner.Text()
+		// if so, add the current maze to the list of mazes
+		if line == "#" {
+			mazes = append(mazes, maze)
+			// Reset the maze slice for the next maze
+			mazes = nil
+		} else {
+			parts := strings.Fields(line)
+			row := make([]int, len(parts))
+			for i, part := range parts {
+				value, err := strconv.Atoi(part)
+				if err != nil {
+					return nil, err
+				}
+				row[i] = value
+			}
+			maze = append(maze, row)
+		}
+	}
+	return mazes, err
 }
 
 func main() {
