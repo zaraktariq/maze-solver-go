@@ -75,22 +75,33 @@ func loadMazeFromFile(filename string) ([][][]int, error) {
 
 	// Check if the line is a delimiter
 	for scanner.Scan() {
+		// Read the next line from the file
 		line := scanner.Text()
-		// if so, add the current maze to the list of mazes
+
+		// Check if the line is a delimiter
 		if line == "#" {
+			// Add the current maze to the list of mazes
 			mazes = append(mazes, maze)
 			// Reset the maze slice for the next maze
-			mazes = nil
+			maze = nil
 		} else {
+			// If the line is not a delimiter, it contains maze data
+			// Process the line as maze data
+			// Split the line into individual values
 			parts := strings.Fields(line)
+			// Create a slice to store the values of the current row in the maze
 			row := make([]int, len(parts))
+			// Iterate over the parts of the line and convert them to integers
 			for i, part := range parts {
 				value, err := strconv.Atoi(part)
 				if err != nil {
+					// If an error occurs while converting, return the error
 					return nil, err
 				}
+				// Store the converted value in the current row
 				row[i] = value
 			}
+			// Append the current row to the maze
 			maze = append(maze, row)
 		}
 	}
