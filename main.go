@@ -111,7 +111,7 @@ func main() {
 	}
 
 	fmt.Println("Available Mazes:")
-	for i, _ := range mazes {
+	for i := range mazes {
 		fmt.Printf("Maze %d\n", i+1)
 	}
 
