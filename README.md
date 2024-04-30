@@ -1,5 +1,4 @@
 ## Maze Solver
-----
 This Go program is designed to solve mazes loaded from a text file. It provides functionality to read maze data from the file, display available mazes, allow the user to choose a maze to solve, and then find a path from the start to the end of the maze.
 
 ----
